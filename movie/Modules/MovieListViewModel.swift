@@ -36,6 +36,8 @@ class MovieListViewViewModel {
         return _movies.value.count
     }
     
+    private var tempMovies: [Movie] = []
+    
     init(movieService: MovieService) {
         self.movieService = movieService
         fetchMovies()
@@ -48,13 +50,26 @@ class MovieListViewViewModel {
         return MovieViewModel(movie: _movies.value[index])
     }
     
-    func fetchMovies() {
+    func filterMovie(year: String?) {
+        let moviesValue = tempMovies
+        if let year = year {
+            let movies = tempMovies.filter { movie -> Bool in
+                movie.release_date == year
+            }
+            _movies.accept(movies)
+        } else {
+            _movies.accept(moviesValue)
+        }
+    }
+    
+    private func fetchMovies() {
         self._movies.accept([])
         self._isFetching.accept(true)
         self._error.accept(nil)
         movieService.fetchMovies(successHandler: {[weak self] (response) in
             self?._isFetching.accept(false)
             self?._movies.accept(response)
+            self?.tempMovies = response
         }) { [weak self] (error) in
             self?._isFetching.accept(false)
             self?._error.accept(error.localizedDescription)

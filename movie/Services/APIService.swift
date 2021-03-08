@@ -7,7 +7,6 @@
 
 import Foundation
 import RxSwift
-import Moya
 
 protocol MovieRepository {
     func fetchMovies(successHandler: @escaping (_ response: [Movie]) -> Void, errorHandler: @escaping(_ error: Error) -> Void)
@@ -20,10 +19,8 @@ class MovieService: MovieRepository {
     
     private let jsonDecoder: JSONDecoder = {
         let jsonDecoder = JSONDecoder()
-        jsonDecoder.keyDecodingStrategy = .convertFromSnakeCase
-        let dateFormatter = DateFormatter()
-        dateFormatter.dateFormat = "yyyy-mm-dd"
-        jsonDecoder.dateDecodingStrategy = .formatted(dateFormatter)
+        jsonDecoder.keyDecodingStrategy = .useDefaultKeys
+        jsonDecoder.dateDecodingStrategy = .millisecondsSince1970
         return jsonDecoder
     }()
     
